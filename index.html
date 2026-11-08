@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JÉDO Inventory</title>
+  <meta name="theme-color" content="#06124a">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Inventory</h1>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="search" role="tab" aria-selected="true">Search</button>
+      <button class="tab" data-tab="inventory" role="tab" aria-selected="false">Inventory</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Search: available products only -->
+    <section id="panel-search" class="panel" role="tabpanel">
+      <div class="search-bar">
+        <input id="search-name" type="search" placeholder="Product name" autocomplete="off">
+        <input id="search-volume" type="number" min="0" step="any" placeholder="Volume (e.g. 50)" inputmode="decimal">
+        <button id="search-clear" class="btn secondary" type="button">Clear</button>
+      </div>
+      <p class="meta" id="search-count"></p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Volume</th><th>Qty</th><th></th></tr>
+          </thead>
+          <tbody id="search-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Inventory: full list with sorting, plus add new product -->
+    <section id="panel-inventory" class="panel" role="tabpanel" hidden>
+      <div class="toolbar">
+        <select id="filter-status" aria-label="Filter by status">
+          <option value="all">All items</option>
+          <option value="available">Available</option>
+          <option value="out">Out of stock</option>
+          <option value="taken">Taken</option>
+        </select>
+        <button id="show-add" class="btn primary" type="button">Add New Product</button>
+        <button id="export-csv" class="btn secondary" type="button">Export CSV</button>
+      </div>
+
+      <!-- New product form, shown by "Add New Product" -->
+      <form id="add-form" class="form" novalidate hidden>
+        <h2 class="form-title">New product</h2>
+        <label>
+          Product name *
+          <input id="add-name" name="name" type="text" maxlength="100" autocomplete="off">
+          <span class="error" data-for="name"></span>
+        </label>
+        <div class="row">
+          <label>
+            Volume *
+            <input id="add-volume" name="volume" type="number" min="0" step="any" inputmode="decimal">
+            <span class="error" data-for="volume"></span>
+          </label>
+          <label>
+            Unit
+            <select id="add-unit" name="unit">
+              <option value="ml">ml</option>
+              <option value="L">L</option>
+              <option value="g">g</option>
+              <option value="kg">kg</option>
+              <option value="oz">oz</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          Quantity
+          <input id="add-quantity" name="quantity" type="number" min="0" step="1" value="1" inputmode="numeric">
+          <span class="error" data-for="quantity"></span>
+        </label>
+        <label>
+          Notes
+          <textarea id="add-notes" name="notes" rows="3" maxlength="500"></textarea>
+        </label>
+        <div class="form-actions">
+          <button class="btn primary block" type="submit">Save product</button>
+          <button id="add-cancel" class="btn secondary block" type="button">Cancel</button>
+        </div>
+      </form>
+
+      <p class="meta" id="inventory-count"></p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th><button class="sort" data-sort="name" type="button">Name <span></span></button></th>
+              <th><button class="sort" data-sort="volume" type="button">Volume <span></span></button></th>
+              <th>Qty</th>
+              <th>Status</th>
+              <th><button class="sort" data-sort="date" type="button">Added <span></span></button></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="inventory-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
