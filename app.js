@@ -28,6 +28,58 @@
     } catch (e) {
       toast('Could not save on this device. Storage may be full or blocked.');
     }
+    pushCloud();
+  }
+
+  // ---------- Shared list (Supabase) ----------
+  // All products live in one row of the "inventory" table. Every save writes
+  // the whole list, and the app reloads it every 20 seconds and on focus.
+
+  var ROW_ID = 'main';
+  var cloud = null;
+  var pushTimer = null;
+
+  if (window.supabase && window.INVENTORY_CONFIG && INVENTORY_CONFIG.url && INVENTORY_CONFIG.anonKey) {
+    cloud = window.supabase.createClient(INVENTORY_CONFIG.url, INVENTORY_CONFIG.anonKey);
+  }
+
+  function setSyncStatus(text) {
+    var el = $('sync-status');
+    if (el) el.textContent = text;
+  }
+
+  function pullCloud() {
+    // Don't overwrite local changes that haven't been pushed yet.
+    if (!cloud || pushTimer) return;
+    cloud.from('inventory').select('data').eq('id', ROW_ID).single().then(function (res) {
+      if (res.error || !res.data) {
+        setSyncStatus('Could not reach the shared list. Showing this device\'s copy.');
+        return;
+      }
+      if (Array.isArray(res.data.data)) {
+        items = res.data.data;
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch (e) {}
+        setSyncStatus('Shared list: up to date');
+        refreshCurrentTab();
+      }
+    });
+  }
+
+  function pushCloud() {
+    if (!cloud) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(function () {
+      pushTimer = null;
+      cloud.from('inventory').upsert({ id: ROW_ID, data: items }).then(function (res) {
+        setSyncStatus(res.error ? 'Could not save to the shared list. Check your connection.' : 'Shared list: up to date');
+      });
+    }, 300);
+  }
+
+  function refreshCurrentTab() {
+    var active = document.querySelector('.tab.active');
+    if (active && active.dataset.tab === 'inventory') renderInventory();
+    else renderSearch();
   }
 
   // ---------- Helpers ----------
@@ -477,6 +529,14 @@
   // ---------- Start ----------
 
   showTab('search');
+
+  if (cloud) {
+    pullCloud();
+    setInterval(pullCloud, 20000);
+    window.addEventListener('focus', pullCloud);
+  } else {
+    setSyncStatus('This device only. Add your Supabase keys in config.js to share the list.');
+  }
 
   // Offline support. Only works when the app is served over http(s),
   // not when index.html is opened directly from a file.

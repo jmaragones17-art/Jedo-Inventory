@@ -53,6 +53,12 @@ body {
   backdrop-filter: blur(6px);
 }
 
+.sync-status {
+  margin: 8px 0 10px;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
 .app-header h1 {
   margin: 0 0 8px;
   font-size: 1.25rem;

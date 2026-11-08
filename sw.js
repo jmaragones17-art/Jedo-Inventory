@@ -1,10 +1,11 @@
 // Caches the app files so it keeps working without an internet connection.
-var CACHE = 'inventory-v1';
+var CACHE = 'inventory-v2';
 var FILES = [
   './',
   './index.html',
   './styles.css',
   './app.js',
+  './config.js',
   './manifest.webmanifest',
   './assets/background.jpg'
 ];
