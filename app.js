@@ -404,6 +404,7 @@
 
     item.quantity += qty;
     item.status = 'available';
+    item.dateAdded = new Date().toISOString();
     save();
     renderInventory();
     toast('Added ' + qty + ' to "' + item.name + '". Stock is now ' + item.quantity + '.');

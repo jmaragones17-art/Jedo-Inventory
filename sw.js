@@ -1,5 +1,5 @@
 // Caches the app files so it keeps working without an internet connection.
-var CACHE = 'inventory-v3';
+var CACHE = 'inventory-v4';
 var FILES = [
   './',
   './index.html',
